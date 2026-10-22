@@ -1,0 +1,43 @@
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                sh 'git log -1 --oneline'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'ls -la'
+                sh 'test -f index.html'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'test -s index.html'
+                echo 'Website test passed!'
+            }
+        }
+
+        stage('Deploy Production') {
+            steps {
+                sh 'cp index.html /var/www/branch-deploy/production/'
+                echo 'Production deployment completed!'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Production pipeline succeeded!'
+        }
+        failure {
+            echo 'Production pipeline failed!'
+        }
+    }
+}
